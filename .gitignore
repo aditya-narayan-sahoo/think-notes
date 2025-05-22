@@ -1,0 +1,12 @@
+node_modules
+*.log
+.vscode
+*.env
+build
+dist
+.cache
+coverage
+database
+public
+server
+client
