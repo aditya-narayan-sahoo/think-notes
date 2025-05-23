@@ -14,6 +14,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  res
+    .status(err.status || 500)
+    .json({ message: err.message || "Internal Server Error" });
+});
+
 connectDB();
 app.use("/api/notes", notesRoute);
 
