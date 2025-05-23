@@ -5,6 +5,7 @@ import express from "express";
 import connectDB from "./config/db.js";
 
 import notesRoute from "./routes/notes.route.js";
+import rateLimiter from "./middleware/rateLimiter.js";
 
 dotenv.config();
 const PORT = process.env.PORT || 5432;
@@ -13,6 +14,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(rateLimiter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -21,13 +23,14 @@ app.use((err, req, res, next) => {
     .json({ message: err.message || "Internal Server Error" });
 });
 
-connectDB();
 app.use("/api/notes", notesRoute);
 
 app.get("/", (req, res) => {
   res.send("Hello from the backend");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+  });
 });
