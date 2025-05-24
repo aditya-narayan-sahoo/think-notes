@@ -1,28 +1,41 @@
 import rateLimit from "../config/upstash.js";
 
 /**
- * A middleware to limit the number of incoming requests using Upstash's
- * rate limiter.
+ * Get the IP address of the client from the request.
+ * If the request contains the X-Forwarded-For header, use that.
+ * Otherwise, use the `req.ip` property.
+ * @param {Object} req - The HTTP request object.
+ * @returns {string} The IP address of the client.
+ */
+const getIp = (req) => {
+  const xfwd = req.headers["x-forwarded-for"];
+  return xfwd ? xfwd.split(",")[0].trim() : req.ip;
+};
+
+/**
+ * Middleware function to enforce rate limiting using Upstash Ratelimit.
  *
- * @function rateLimiter
- * @param {Object} req - The Express request object.
- * @param {Object} res - The Express response object.
- * @param {Function} next - The next middleware in the stack.
- * @throws {Error} If the rate limit is exceeded, a 429 error is thrown.
- * @throws {Error} If there is an error with the rate limiter, the error is
- *   re-thrown.
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @param {Function} next - The next middleware function.
  */
 const rateLimiter = async (req, res, next) => {
   try {
-    const { success } = await rateLimit.limit("my-rate-limit");
+    const key = getIp(req);
+    const { success, remaining, reset } = await rateLimit.limit(key);
+
+    res.setHeader("X-RateLimit-Remaining", remaining);
+    res.setHeader("X-RateLimit-Reset", reset);
+
     if (!success) {
-      return res
-        .status(429)
-        .json({ message: "Too many requests, please try again later" });
+      return res.status(429).json({
+        message: "Too many requests. Please try again later.",
+      });
     }
+
     next();
   } catch (error) {
-    console.error(`Rate limit error: ${error.message}`);
+    console.error("Rate limit error:", error);
     next(error);
   }
 };
