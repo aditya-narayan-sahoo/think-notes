@@ -37,11 +37,14 @@ const CreatePage = () => {
   };
   return (
     <main className="min-h-screen bg-base-200" data-theme="forest">
-      <div className="container mx-auto px-4 py-10">
+      <div className="container mx-auto px-4 py-20">
         <div className="max-w-2xl mx-auto">
           <header className="mb-6">
             <nav>
-              <Link to="/" className="btn btn-ghost gap-2">
+              <Link
+                to="/"
+                className="btn btn-ghost gap-2 hover:bg-base-content/30 hover:scale-105"
+              >
                 <ArrowLeftIcon className="size-5" />
                 <span>Back to Notes</span>
               </Link>
@@ -50,7 +53,7 @@ const CreatePage = () => {
 
           <article className="card bg-base-100 shadow-xl">
             <div className="card-body">
-              <h1 className="card-title text-3xl font-semibold mb-6">
+              <h1 className="card-title text-2xl font-semibold mb-6">
                 Create New Note
               </h1>
 
