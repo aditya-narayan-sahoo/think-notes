@@ -1,10 +1,12 @@
+import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 
 import api from "../lib/axios";
-import toast from "react-hot-toast";
+
 import Navbar from "../components/Navbar";
-import RateLimited from "../components/RateLimited";
 import NoteCard from "../components/NoteCard";
+import RateLimited from "../components/RateLimited";
+import NotesNotFound from "../components/NotesNotFound";
 
 const HomePage = () => {
   const [notes, setNotes] = useState([]);
@@ -45,6 +47,7 @@ const HomePage = () => {
             <span className="loading loading-dots loading-md ml-2"></span>
           </div>
         )}
+        {notes.length === 0 && !loading && !isRateLimited && <NotesNotFound />}
         {notes.length > 0 && !isRateLimited && (
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {notes.map((note) => (
